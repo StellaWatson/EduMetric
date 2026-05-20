@@ -15,18 +15,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { LanguageToggle } from './language-toggle';
+import { useT } from '@/lib/i18n/store';
 
 export function Topbar() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
   const clear = useAuthStore((s) => s.clear);
+  const t = useT();
 
   function handleLogout() {
     authApi.logout();
     clear();
-    // Full reload — drops React Query cache so cross-role data from this
-    // session doesn't leak into the next sign-in.
     window.location.assign('/login');
   }
 
@@ -35,23 +36,24 @@ export function Topbar() {
       <div className="relative hidden sm:block max-w-md flex-1">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
-          placeholder="Search students, achievements…"
+          placeholder={t('topbar.search')}
           className="h-9 w-full rounded-md border bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        <LanguageToggle />
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Toggle theme"
+          aria-label={t('topbar.theme')}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
           <Sun className="h-4 w-4 dark:hidden" />
           <Moon className="hidden h-4 w-4 dark:block" />
         </Button>
 
-        <Button variant="ghost" size="icon" aria-label="Notifications">
+        <Button variant="ghost" size="icon" aria-label={t('topbar.notifications')}>
           <Bell className="h-4 w-4" />
         </Button>
 
@@ -66,13 +68,13 @@ export function Topbar() {
             <DropdownMenuLabel>{user?.email ?? 'Not signed in'}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push('/account/profile')}>
-              <UserIcon className="mr-2 h-4 w-4" /> Account
+              <UserIcon className="mr-2 h-4 w-4" /> {t('topbar.account')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/account/settings')}>
-              <Settings className="mr-2 h-4 w-4" /> Settings
+              <Settings className="mr-2 h-4 w-4" /> {t('topbar.settings')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" /> Sign out
+              <LogOut className="mr-2 h-4 w-4" /> {t('topbar.signout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

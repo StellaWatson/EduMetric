@@ -6,11 +6,13 @@ import { GraduationCap } from 'lucide-react';
 import { useAuthStore } from '@/store/auth-store';
 import { NAV_BY_ROLE } from '@/lib/constants/nav';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useT } from '@/lib/i18n/store';
 import { cn } from '@/lib/utils';
 
 export function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+  const t = useT();
 
   return (
     <aside className="hidden md:flex w-64 flex-col border-r bg-card">
@@ -20,7 +22,7 @@ export function Sidebar() {
         </div>
         <div className="leading-tight">
           <div className="text-sm font-semibold tracking-tight">EduMetric</div>
-          <div className="text-[10px] text-muted-foreground">Scholarship intelligence</div>
+          <div className="text-[10px] text-muted-foreground">{t('brand.tagline')}</div>
         </div>
       </div>
 
@@ -49,7 +51,7 @@ export function Sidebar() {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })

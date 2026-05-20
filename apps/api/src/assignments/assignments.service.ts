@@ -7,6 +7,7 @@ import { ScoringService } from '../scoring/scoring.service';
 import { StudentsService } from '../students/students.service';
 import { PenaltiesService } from '../penalties/penalties.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
+import { BulkAssignmentDto } from './dto/bulk-assignment.dto';
 import { FlagPlagiarismDto } from './dto/plagiarism.dto';
 import { ASSIGNMENT_WEIGHTS } from '../scoring/kpi.constants';
 import { AuthenticatedUser } from '../auth/strategies/jwt-payload.interface';
@@ -96,6 +97,48 @@ export class AssignmentsService {
       actor,
     );
     return updated;
+  }
+
+  /**
+   * Bulk-assign one task to many students at once. Used by mentors to
+   * publish homework / projects to their assigned group.
+   *
+   * Each student gets a fresh Assignment row with all scores 0 (pending
+   * evaluation). The mentor later scores each one individually.
+   */
+  async bulkAssign(dto: BulkAssignmentDto, actor: AuthenticatedUser) {
+    // Authz: confirm mentor can act on each student
+    for (const id of dto.studentIds) {
+      await this.students.assertCanRead(id, actor);
+    }
+
+    const created = await this.prisma.$transaction(
+      dto.studentIds.map((studentId) =>
+        this.prisma.assignment.create({
+          data: {
+            studentId,
+            subject: dto.subject,
+            title: dto.title,
+            completionScore: 0,
+            qualityScore: 0,
+            originalityScore: 0,
+            deadlineScore: 0,
+            totalScore: 0,
+            reviewedById: actor.sub,
+          },
+        }),
+      ),
+    );
+
+    await this.activityLogs.log({
+      actorId: actor.sub,
+      targetStudentId: null,
+      action: ActivityAction.ASSIGNMENT_RECORDED,
+      description: `Bulk-assigned "${dto.title}" (${dto.subject}) to ${dto.studentIds.length} students`,
+      metadata: { count: dto.studentIds.length, subject: dto.subject },
+    });
+
+    return { count: created.length };
   }
 
   async findByStudent(studentId: string, actor: AuthenticatedUser) {

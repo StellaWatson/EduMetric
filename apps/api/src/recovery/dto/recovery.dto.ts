@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString, IsUUID, Max, Min, MinLength } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNumber, IsOptional, IsString, IsUUID, IsUrl, Max, Min, MinLength } from 'class-validator';
 
 export class AssignRecoveryDto {
   @ApiProperty()
@@ -10,13 +10,33 @@ export class AssignRecoveryDto {
   @IsString()
   @MinLength(5)
   assignedTask!: string;
+
+  /** Optional URL to a material / brief / form (Cloudinary upload, doc, etc.). */
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  materialUrl?: string;
+}
+
+export class BulkAssignRecoveryDto {
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsUUID('all', { each: true })
+  studentIds!: string[];
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(5)
+  assignedTask!: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  materialUrl?: string;
 }
 
 export class CompleteRecoveryDto {
-  /**
-   * Points recovered (server clamps to min(|penalty|/2, 10) per student).
-   * Default = full available cap.
-   */
   @ApiProperty({ required: false, minimum: 0, maximum: 10 })
   @IsOptional()
   @IsNumber()

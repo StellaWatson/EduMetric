@@ -12,4 +12,4 @@ export const ROLE_REDIRECTS: Record<Role, string> = {
   GUEST: '/guest/leaderboard',
 };
 
-export const PUBLIC_ROUTES = ['/', '/login', '/register', '/guest'];
+export const PUBLIC_ROUTES = ['/', '/login', '/register', '/guest', '/public'];

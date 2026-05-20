@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RecoveryService } from './recovery.service';
 import {
   AssignRecoveryDto,
+  BulkAssignRecoveryDto,
   CompleteRecoveryDto,
   RejectRecoveryDto,
 } from './dto/recovery.dto';
@@ -21,6 +22,13 @@ export class RecoveryController {
   @Roles(Role.TUTOR, Role.ADMIN, Role.SUPER_ADMIN)
   assign(@Body() dto: AssignRecoveryDto, @CurrentUser() actor: AuthenticatedUser) {
     return this.recovery.assign(dto, actor);
+  }
+
+  /** Tutor bulk-assigns one recovery task to many students. */
+  @Post('assign-bulk')
+  @Roles(Role.TUTOR, Role.ADMIN, Role.SUPER_ADMIN)
+  bulkAssign(@Body() dto: BulkAssignRecoveryDto, @CurrentUser() actor: AuthenticatedUser) {
+    return this.recovery.bulkAssign(dto, actor);
   }
 
   @Post(':id/complete')

@@ -4,6 +4,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ScoringService } from '../scoring/scoring.service';
 import { KpiBreakdown } from '../scoring/scoring.types';
 
+function round1(n: number): number {
+  return Math.round(n * 10) / 10;
+}
+
 interface LeaderboardQuery {
   faculty?: string;
   group?: string;
@@ -76,6 +80,45 @@ export class LeaderboardService {
       breakdown: entry.kpi
         ? this.pickBreakdown(entry.kpi)
         : null,
+    }));
+  }
+
+  /**
+   * Spreadsheet-shaped public ranking. Wide row schema that mirrors the
+   * Google Sheets / Excel "scholarship dashboard" format. Use this endpoint
+   * to drive an external sheet — every row maps 1:1 to a column on the
+   * institutional ranking spreadsheet.
+   *
+   * Public — no PII beyond name + group; no GPA precision past 1 decimal.
+   */
+  async getSheet(query: { faculty?: string; group?: string }) {
+    const entries = await this.getLeaderboard({ ...query, limit: 500 });
+    return entries.map((e) => ({
+      rank: e.rank,
+      fullName: e.fullName,
+      group: e.group,
+      faculty: e.faculty,
+      status: e.scholarshipStatus,
+      academicPercent: e.gpa,
+      academicBall: e.breakdown?.academicScore ?? 0,
+      attendancePercent: e.attendancePercent,
+      attendanceBall: e.breakdown?.attendanceScore ?? 0,
+      assignmentBall: e.breakdown?.assignmentScore ?? 0,
+      activityBall: e.breakdown?.activityScore ?? 0,
+      tutorBall: e.breakdown?.tutorScore ?? 0,
+      disciplineBall: e.breakdown?.disciplineScore ?? 0,
+      totalBall: round1(
+        (e.breakdown?.academicScore ?? 0) +
+        (e.breakdown?.attendanceScore ?? 0) +
+        (e.breakdown?.assignmentScore ?? 0) +
+        (e.breakdown?.activityScore ?? 0) +
+        (e.breakdown?.tutorScore ?? 0) +
+        (e.breakdown?.disciplineScore ?? 0),
+      ),
+      penaltyBall: e.breakdown?.penaltyScore ?? 0,
+      recoveryBall: e.breakdown?.recoveryScore ?? 0,
+      employmentBall: e.breakdown?.employmentBonus ?? 0,
+      finalScore: e.finalScore,
     }));
   }
 

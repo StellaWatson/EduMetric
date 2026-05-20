@@ -25,6 +25,19 @@ export class LeaderboardController {
     });
   }
 
+  /**
+   * Spreadsheet-shaped public dashboard. Mirrors the column set of the
+   * Google Sheets / Excel ranking dashboard so embedders can sync any
+   * external sheet by simply pulling this endpoint on a timer.
+   *
+   * Public route — safe to share. No PII beyond names.
+   */
+  @Public()
+  @Get('sheet')
+  sheet(@Query('faculty') faculty?: string, @Query('group') group?: string) {
+    return this.leaderboard.getSheet({ faculty, group });
+  }
+
   /** Explainable breakdown for a single student — also public. */
   @Public()
   @Get('student/:studentId/why')

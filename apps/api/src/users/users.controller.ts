@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangeRoleDto } from './dto/change-role.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/types/role.enum';
 
@@ -44,6 +45,13 @@ export class UsersController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserDto) {
     return this.usersService.update(id, dto);
+  }
+
+  /** Super-admin only: change a user's role. */
+  @Patch(':id/role')
+  @Roles(Role.SUPER_ADMIN)
+  changeRole(@Param('id', ParseUUIDPipe) id: string, @Body() dto: ChangeRoleDto) {
+    return this.usersService.update(id, { role: dto.role });
   }
 
   @Delete(':id')

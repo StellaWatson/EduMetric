@@ -3,7 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { bootstrapLang } from '@/lib/i18n/store';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -11,6 +12,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       queries: { staleTime: 60_000, refetchOnWindowFocus: false },
     },
   }));
+
+  useEffect(() => {
+    bootstrapLang();
+  }, []);
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
