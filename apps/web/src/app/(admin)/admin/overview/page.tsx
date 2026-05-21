@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -51,7 +52,7 @@ function StatCard({ label, value, icon: Icon, tone = 'default', href }: StatCard
       </CardContent>
     </Card>
   );
-  return href ? <Link href={href}>{inner}</Link> : inner;
+  return href ? <Link href={href as Route}>{inner}</Link> : inner;
 }
 
 export default function AdminOverviewPage() {

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { useStudents } from '@/lib/hooks/use-students';
@@ -67,7 +68,7 @@ export function StudentsTable({ profileBase = '/admin/students' }: { profileBase
                 <tr key={s.id} className="hover:bg-muted/30">
                   <td className="px-4 py-3">
                     <Link
-                      href={`${profileBase}/${s.id}`}
+                      href={`${profileBase}/${s.id}` as Route}
                       className="flex items-center gap-3 hover:text-primary"
                     >
                       <Avatar fallback={s.user.fullName} src={s.user.avatar ?? undefined} size="sm" />
