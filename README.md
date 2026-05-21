@@ -66,3 +66,4 @@ npm run dev
 - [docs/KPI-ENGINE.md](docs/KPI-ENGINE.md) — scoring formulas, thresholds, tie-breaks
 - [docs/API.md](docs/API.md) — REST surface
 - [docs/DEMO-FLOW.md](docs/DEMO-FLOW.md) — judge demo script
+# edumetric-crm-hack
